@@ -1,0 +1,12 @@
+---
+slug: :mikutter-datasource-search
+depends:
+  mikutter: 3.0.5
+  plugin:
+  - gtk
+  - gui
+  - settings
+version: '0.0.1'
+author: moguno
+name: 検索データソース
+description: 検索結果を流すデータソースを追加します。
