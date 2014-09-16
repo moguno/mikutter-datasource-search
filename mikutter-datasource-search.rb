@@ -160,7 +160,6 @@ Plugin.create(:test) {
       [widgets[:name_edit], widgets[:query_edit]].each { |entry|
         entry.signal_connect('changed') { |widget|
           widgets[:ok_button].sensitive = [widgets[:name_edit], widgets[:query_edit]].all? { |entry2|
-            puts entry2.text.gsub(/[ \t]+/, "").empty?
             !entry2.text.gsub(/[ \t]+/, "").empty?
           }
         }
@@ -199,6 +198,8 @@ Plugin.create(:test) {
 
   # 検索データソースを検索する
   def refresh(slug)
+    notice "datasource_search refresh:#{slug.to_s}"
+
     item = UserConfig[:datasource_search][slug]
     params = {}
     params[:q] = item[:query]
@@ -242,5 +243,62 @@ Plugin.create(:test) {
     end
 
     [datasources]
+  }
+
+  # リフレッシュに対応してるデータソース一覧
+  filter_refreshable_datasources { |datasources|
+    if UserConfig[:datasource_search]
+      UserConfig[:datasource_search].each { |slug, item|
+        datasources << slug
+      }
+    end
+
+    [datasources]
+  }
+
+  # リフレッシュイベント
+  on_datasource_refresh { |slugs|
+    if UserConfig[:datasource_search]
+      slugs.each { |slug|
+        if UserConfig[:datasource_search][slug]
+          refresh(slug)
+        end
+      }
+    end
+  }
+
+  # slugから抽出タブを得る
+  def get_extract_by_slug(slug)
+    extract_pair = Plugin[:extract].extract_tabs.find { |key, value| value[:slug] == slug }
+
+    if extract_pair
+      extract_pair[1]
+    else
+      nil
+    end
+  end
+
+  # タブにデータソースのリフレッシュボタンを表示する
+  command(:datasource_refresh,
+          name: "データソースのリフレッシュ",
+          condition: lambda { |opt| 
+            extract = get_extract_by_slug(opt.widget.slug)
+
+            if extract
+              refreshable = Plugin.filtering(:refreshable_datasources, [])
+
+              extract[:sources].any? { |source| refreshable[0].include?(source) }
+            else
+              false
+            end
+          },
+          icon: File.join(File.dirname(__FILE__), "playback_reload.png"),
+          visible: true,
+          role: :tab) { |opt|
+    (key, extract) = Plugin[:extract].extract_tabs.find { |key, value| value[:slug] == opt.widget.slug }
+
+    if extract
+      Plugin.call(:datasource_refresh, extract[:sources])
+    end
   }
 }
