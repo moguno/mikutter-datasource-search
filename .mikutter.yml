@@ -6,7 +6,7 @@ depends:
   - gtk
   - gui
   - settings
-version: '0.0.2'
+version: '0.1.0'
 author: moguno
 name: 検索データソース
 description: 検索結果を流すデータソースを追加します。
