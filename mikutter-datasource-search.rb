@@ -238,7 +238,7 @@ Plugin.create(:test) {
   filter_extract_datasources { |datasources|
     if UserConfig[:datasource_search]
       UserConfig[:datasource_search].each { |slug, item|
-        datasources[slug.to_sym] = item[:name]
+        datasources[slug.to_sym] = "検索/#{item[:name]}"
       }
     end
 
