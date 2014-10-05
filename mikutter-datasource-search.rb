@@ -1,6 +1,6 @@
 #coding: utf-8
 
-Plugin.create(:test) { 
+Plugin.create(:mikutter_datasource_search) { 
 
   # 検索データソースを管理するCRUDクラス
   class DataSourceList < Gtk::CRUD
