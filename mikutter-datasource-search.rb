@@ -181,9 +181,13 @@ Plugin.create(:mikutter_datasource_search) {
   counter = gen_counter
 
   on_period { |service|
-    if counter.call >= UserConfig[:retrieve_interval_search]
-      counter = gen_counter
-      refresh_all
+    if service == Service.primary
+      count = counter.call
+
+      if count >= UserConfig[:retrieve_interval_search]
+        counter = gen_counter
+        refresh_all
+      end
     end
   }
 
