@@ -1,6 +1,6 @@
 #coding: utf-8
 
-Plugin.create(:test) { 
+Plugin.create(:mikutter_datasource_search) { 
 
   # 検索データソースを管理するCRUDクラス
   class DataSourceList < Gtk::CRUD
@@ -181,9 +181,13 @@ Plugin.create(:test) {
   counter = gen_counter
 
   on_period { |service|
-    if counter.call >= UserConfig[:retrieve_interval_search]
-      counter = gen_counter
-      refresh_all
+    if service == Service.primary
+      count = counter.call
+
+      if count >= UserConfig[:retrieve_interval_search]
+        counter = gen_counter
+        refresh_all
+      end
     end
   }
 
